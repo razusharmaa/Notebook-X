@@ -2,51 +2,98 @@ import NoteContext from "./NoteContext";
 import { useState } from "react";
 
 const NoteState = (props) => {
-    const initialNote =[
-        {
-          "_id": "65eee5e13894c3fe2bf3ae91",
-          "user": "65e5396ade098a8dc609ca94",
-          "title": "ajdshn note",
-          "description": "my 1st description",
-          "tag": "whats tag",
-          "date": "2024-03-11T11:07:13.978Z",
-          "__v": 0
-        },
-        {
-          "_id": "65f29152c9a7323fb22a6123",
-          "user": "65e5396ade098a8dc609ca94",
-          "title": " My dream",
-          "description": "there is nothing special in mine dream , ...",
-          "tag": " omg",
-          "date": "2024-03-14T05:55:30.356Z",
-          "__v": 0
-        },
-        {
-          "_id": "65eee8713894c3fe2bf3ae91",
-          "user": "65e5396ade098a8dc609ca94",
-          "title": "poooo tasty",
-          "description": "fav food",
-          "tag": "whats tag",
-          "date": "2024-03-11T11:07:13.978Z",
-          "__v": 0
-        },
-        {
-          "_id": "659399152c9a7323fb22a6123",
-          "user": "65e5396ade098a8dc609ca94",
-          "title": " My hucnjd",
-          "description": "there blahin mine dream , ...",
-          "tag": " omg",
-          "date": "2024-03-14T05:55:30.356Z",
-          "__v": 0
-        }
-      ]
-    const [note, setNote] = useState(initialNote);
+  const host = 'http://localhost:5000';
+  const [notes, setNotes] = useState([]);
+  const headers = {
+    "Content-Type": "application/json",
+    "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjVlNTM5NmFkZTA5OGE4ZGM2MDljYTk0In0sImlhdCI6MTcxMDAwNjc1MH0.aegcpCY35p45NTimObytrTCioXu21oDMD1E7K5nMCTQ"
+  };
 
-    return (
-        <NoteContext.Provider value={{note,setNote}}>
-            {props.children}
-        </NoteContext.Provider>
-    )
+  const getNote = async () => {
+    try {
+      const response = await fetch(`${host}/api/note/fetchallnotes`, { method: "GET", headers });
+      if (!response.ok) throw new Error("Failed to fetch notes");
+      const data = await response.json();
+      setNotes(data);
+    } catch (error) {
+      console.error(error);
+      props.showAlert("Unable to fetch data", "danger");
+    }
+  };
+
+  const addNote = async (newNote) => {
+    const { title, description, tag } = newNote;
+    try {
+      const response = await fetch(`${host}/api/note/addnote`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ title, description, tag }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add note");
+      }
+      const note = await response.json();
+      setNotes(oldNotes => [...oldNotes, note]);
+      return true;  // Return true when note is successfully added
+    } catch (error) {
+      console.error(error);
+      props.showAlert(`${error}`, "danger");
+      return false;  // Return false when there is an error
+    }
+  };
+
+  const editNote = async (id, title, description, tag) => {
+    try {
+      const response = await fetch(`${host}/api/note/updatenote/${id}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ title, description, tag }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update note");
+      }
+      for (let index = 0; index < notes.length; index++) {
+        const element = notes[index];
+        if (element._id === id) {
+          notes[index].title = title;
+          notes[index].description = description;
+          notes[index].tag = tag;
+        }
+      }
+      return true;  // Return true when note is successfully updated
+    } catch (error) {
+      console.error(error);
+      props.showAlert("Unable to update note: "+error.message, "danger");
+      return false;  // Return false when there is an error
+    }
+  };
+
+  const deleteNote = async (id) => {
+    try {
+      const response = await fetch(`${host}/api/note/deletenote/${id}`, {
+        method: "DELETE",
+        headers,
+      });
+      if (!response.ok) {
+        throw new Error((await response.json()).error || "Failed to delete note");
+      }
+      setNotes(notes.filter(note => note._id !== id));
+      return true;  // Return true when note is successfully deleted
+    } catch (error) {
+      console.error(error);
+      props.showAlert("Unable to delete note: "+error.message, "danger");
+      return false;  // Return false when there is an error
+    }
+  }
+  
+
+  return (
+    <NoteContext.Provider value={{ notes, addNote, deleteNote, getNote, editNote }}>
+      {props.children}
+    </NoteContext.Provider>
+  )
 }
 
 export default NoteState;
