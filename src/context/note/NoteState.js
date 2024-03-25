@@ -6,8 +6,7 @@ const NoteState = (props) => {
   const [notes, setNotes] = useState([]);
   const headers = {
     "Content-Type": "application/json",
-    "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjVlNTM5NmFkZTA5OGE4ZGM2MDljYTk0In0sImlhdCI6MTcxMDAwNjc1MH0.aegcpCY35p45NTimObytrTCioXu21oDMD1E7K5nMCTQ"
-  };
+    "auth-token":localStorage.getItem("token")};
 
   const getNote = async () => {
     try {

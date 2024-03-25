@@ -66,14 +66,15 @@ router.post('/login', [
   }
 
   const {email, password}=req.body
+  let success = false
   try{
     let UserLogin = await User.findOne({email})
     if(!UserLogin) {
-      return res.status(400).json({"error":"Sorry the user does not exist"})
+      return res.status(400).json({success,"error":"Sorry the user does not exist"})
     }
     const PasswordCompare = await bcrypt.compare(password, UserLogin.password)
     if(!PasswordCompare) {
-      return res.status(401).json({"error":"Sorry the password isn't correct"})
+      return res.status(401).json({success,"error":"Sorry the password isn't correct"})
     }
 
     const data1={
@@ -82,11 +83,12 @@ router.post('/login', [
       }
     }
     const authToken = jwt.sign(data1, JWT_Secreat);
-    res.json({authToken})
+    success=true;
+    res.json({success,authToken, name: UserLogin.name})
 
   } catch(error) {
     console.log(error)
-    res.status(400).json({error: error});
+    res.status(400).json({success,error: error});
   }
 })
 
@@ -99,7 +101,7 @@ try {
   res.send(user)
 } catch (error) {
   console.log(error)
-  res.status(400).json({error: error});
+  res.status(400).json({success,error: error});
 }
 })
 

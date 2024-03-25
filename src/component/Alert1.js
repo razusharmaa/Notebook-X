@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Alert from 'react-bootstrap/Alert';
 
-const Alert1 = ({ variant,msg }) => {
-  const [mode,setMode]=React.useState(true)
-  setTimeout(() => {
-    setMode(false);
-  },1500)
+const Alert1 = ({ variant, msg }) => {
+  const [show, setShow] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShow(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-  <>
-    {
-   mode && <Alert variant={variant}>
-      {msg}
-    </Alert>
-    }
-      </>
+    <div className="alert-container position-fixed top-0 w-100">
+      {show && <Alert variant={variant}>{msg}</Alert>}
+    </div>
   );
 };
 

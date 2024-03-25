@@ -11,3 +11,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+/*  Login Form */
+.cd{
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: fixed;
+}
+
+/* footer fix */
+.MDBBtn:active .FaFacebookF,
+.MDBBtn:focus .FaFacebookF {
+  transform: none;
+}

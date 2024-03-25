@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const EditNote = (props) => {
+const EditNote = () => {
   const location = useLocation();
   const navigate = useNavigate(); // Use useNavigate instead of useHistory
   const noteContext = useContext(NoteContext)

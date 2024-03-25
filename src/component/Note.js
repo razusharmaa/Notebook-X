@@ -1,19 +1,14 @@
-import React, { useContext,useState, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import NoteContext from '../context/note/NoteContext'
 import NoteItem from './NoteItem'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Addnote from './Addnote';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import { FaPlus } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 function Note() {
     const navigate = useNavigate();
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-
     const noteContext = useContext(NoteContext)
     const { notes,getNote } = noteContext
 
@@ -21,9 +16,17 @@ function Note() {
 
     }
 
-    useEffect(()=>{
-        getNote()
-    },[])
+// In Note.js
+useEffect(() => {
+  if(localStorage.getItem('token')){
+    getNote();
+  }
+  else{
+    navigate('/login');
+  }
+  // eslint-disable-next-line
+}, [localStorage.getItem('token')]);
+
 
 // for navigation and editing
    const handleAddNote = () => {
